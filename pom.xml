@@ -1,13 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
-
 	<name>Java BitTorrent library</name>
 	<description>
 		ttorrent is a pure-Java implementation of the BitTorrent protocol,
@@ -104,6 +97,12 @@
 			<groupId>net.sf</groupId>
 			<artifactId>jargs</artifactId>
 			<version>1.0</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>org.ice4j</groupId>
+		  <artifactId>ice4j</artifactId>
+		  <version>0.0.1</version>
 		</dependency>
 	</dependencies>
 
