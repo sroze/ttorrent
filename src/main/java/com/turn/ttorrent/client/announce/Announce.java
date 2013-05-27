@@ -265,7 +265,7 @@ public class Announce implements Runnable {
 	 * @throws UnknownHostException If the tracker address is invalid.
 	 * @throws UnknownServiceException If the tracker protocol is not supported.
 	 */
-	private TrackerClient createTrackerClient(SharedTorrent torrent, Peer peer,
+	protected TrackerClient createTrackerClient(SharedTorrent torrent, Peer peer,
 		URI tracker) throws UnknownHostException, UnknownServiceException {
 		String scheme = tracker.getScheme();
 

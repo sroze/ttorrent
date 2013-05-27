@@ -10,7 +10,7 @@
 	<url>http://turn.github.com/ttorrent/</url>
 	<groupId>com.turn</groupId>
 	<artifactId>ttorrent</artifactId>
-	<version>1.2</version>
+	<version>1.2-open</version>
 	<packaging>jar</packaging>
 
 	<organization>
@@ -34,6 +34,15 @@
 		<system>GitHub</system>
 		<url>https://github.com/turn/ttorrent/issues</url>
 	</issueManagement>
+	
+	<distributionManagement>
+	    <repository>
+	        <id>mvn-loopingz</id>
+	        <name>Loopingz Repository</name>
+	        <url>dav:https://mvn.loopingz.com/</url>
+	        <uniqueVersion>false</uniqueVersion>
+	    </repository>
+	</distributionManagement>
 
 	<developers>
 		<developer>
@@ -97,12 +106,6 @@
 			<groupId>net.sf</groupId>
 			<artifactId>jargs</artifactId>
 			<version>1.0</version>
-		</dependency>
-		
-		<dependency>
-		  <groupId>org.ice4j</groupId>
-		  <artifactId>ice4j</artifactId>
-		  <version>0.0.1</version>
 		</dependency>
 	</dependencies>
 

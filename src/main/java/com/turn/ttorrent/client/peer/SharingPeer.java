@@ -19,6 +19,7 @@ import com.turn.ttorrent.common.Peer;
 import com.turn.ttorrent.common.protocol.PeerMessage;
 import com.turn.ttorrent.client.Piece;
 import com.turn.ttorrent.client.SharedTorrent;
+import com.turn.ttorrent.client.socket.SocketInterface;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -265,7 +266,7 @@ public class SharingPeer extends Peer implements MessageListener {
 	 *
 	 * @param channel The connected socket channel for this peer.
 	 */
-	public synchronized void bind(SocketChannel channel) throws SocketException {
+	public synchronized void bind(SocketInterface channel) throws SocketException {
 		this.unbind(true);
 
 		this.exchange = new PeerExchange(this, this.torrent, channel);

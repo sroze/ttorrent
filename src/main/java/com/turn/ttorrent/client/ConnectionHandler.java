@@ -17,6 +17,8 @@ package com.turn.ttorrent.client;
 
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.client.peer.SharingPeer;
+import com.turn.ttorrent.client.socket.SocketChannelWrapper;
+import com.turn.ttorrent.client.socket.SocketInterface;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -81,20 +83,20 @@ public class ConnectionHandler implements Runnable {
 	public static final int PORT_RANGE_START = 6881;
 	public static final int PORT_RANGE_END = 6889;
 
-	private static final int OUTBOUND_CONNECTIONS_POOL_SIZE = 20;
-	private static final int OUTBOUND_CONNECTIONS_THREAD_KEEP_ALIVE_SECS = 10;
+	protected static final int OUTBOUND_CONNECTIONS_POOL_SIZE = 20;
+	protected static final int OUTBOUND_CONNECTIONS_THREAD_KEEP_ALIVE_SECS = 10;
 
-	private static final int CLIENT_KEEP_ALIVE_MINUTES = 3;
+	protected static final int CLIENT_KEEP_ALIVE_MINUTES = 3;
 
-	private SharedTorrent torrent;
-	private String id;
-	private ServerSocketChannel channel;
-	private InetSocketAddress address;
+	protected SharedTorrent torrent;
+	protected String id;
+	protected ServerSocketChannel channel;
+	protected InetSocketAddress address;
 
-	private Set<IncomingConnectionListener> listeners;
-	private ExecutorService executor;
-	private Thread thread;
-	private boolean stop;
+	protected Set<IncomingConnectionListener> listeners;
+	protected ExecutorService executor;
+	protected Thread thread;
+	protected boolean stop;
 
 	/**
 	 * Create and start a new listening service for out torrent, reporting
@@ -113,8 +115,7 @@ public class ConnectionHandler implements Runnable {
 	 */
 	ConnectionHandler(SharedTorrent torrent, String id, InetAddress address)
 		throws IOException {
-		this.torrent = torrent;
-		this.id = id;
+		this(torrent, id);
 
 		// Bind to the first available port in the range
 		// [PORT_RANGE_START; PORT_RANGE_END].
@@ -141,6 +142,19 @@ public class ConnectionHandler implements Runnable {
 		}
 
 		logger.info("Listening for incoming connections on {}.", this.address);
+	}
+	
+	/**
+	 * Create and start a new listening service for out torrent, reporting
+	 * with our peer ID.
+	 *
+	 * @param torrent The torrent shared by this client.
+	 * @param id This client's peer ID.
+	 */
+	protected ConnectionHandler(SharedTorrent torrent, String id)
+	{
+		this.torrent = torrent;
+		this.id = id;
 
 		this.listeners = new HashSet<IncomingConnectionListener>();
 		this.executor = null;
@@ -168,11 +182,6 @@ public class ConnectionHandler implements Runnable {
 	 * Start accepting new connections in a background thread.
 	 */
 	public void start() {
-		if (this.channel == null) {
-			throw new IllegalStateException(
-				"Connection handler cannot be recycled!");
-		}
-
 		this.stop = false;
 
 		if (this.executor == null || this.executor.isShutdown()) {
@@ -244,7 +253,8 @@ public class ConnectionHandler implements Runnable {
 			try {
 				SocketChannel client = this.channel.accept();
 				if (client != null) {
-					this.accept(client);
+					SocketChannelWrapper socket = new SocketChannelWrapper(client);
+					this.accept(socket);
 				}
 			} catch (SocketTimeoutException ste) {
 				// Ignore and go back to sleep
@@ -268,7 +278,7 @@ public class ConnectionHandler implements Runnable {
 	 * @return A textual representation (<em>host:port</em>) of the given
 	 * socket.
 	 */
-	private String socketRepr(SocketChannel channel) {
+	private String socketRepr(SocketInterface channel) {
 		Socket s = channel.socket();
 		return String.format("%s:%d%s",
 			s.getInetAddress().getHostName(),
@@ -293,7 +303,7 @@ public class ConnectionHandler implements Runnable {
 	 *
 	 * @param client The accepted client's socket channel.
 	 */
-	private void accept(SocketChannel client)
+	protected void accept(SocketInterface client)
 		throws IOException, SocketTimeoutException {
 		try {
 			logger.debug("New incoming connection, waiting for handshake...");
@@ -367,7 +377,7 @@ public class ConnectionHandler implements Runnable {
 	 * any peer ID is accepted (this is the case for incoming connections).
 	 * @return The validated handshake message object.
 	 */
-	private Handshake validateHandshake(SocketChannel channel, byte[] peerId)
+	protected Handshake validateHandshake(SocketInterface channel, byte[] peerId)
 		throws IOException, ParseException {
 		ByteBuffer len = ByteBuffer.allocate(1);
 		ByteBuffer data;
@@ -414,7 +424,7 @@ public class ConnectionHandler implements Runnable {
 	 *
 	 * @param channel The socket channel to the remote peer.
 	 */
-	private int sendHandshake(SocketChannel channel) throws IOException {
+	protected int sendHandshake(SocketInterface channel) throws IOException {
 		return channel.write(
 			Handshake.craft(
 				this.torrent.getInfoHash(),
@@ -427,13 +437,13 @@ public class ConnectionHandler implements Runnable {
 	 * @param channel The socket channel to the newly connected peer.
 	 * @param peerId The peer ID of the connected peer.
 	 */
-	private void fireNewPeerConnection(SocketChannel channel, byte[] peerId) {
+	protected void fireNewPeerConnection(SocketInterface channel, byte[] peerId) {
 		for (IncomingConnectionListener listener : this.listeners) {
 			listener.handleNewPeerConnection(channel, peerId);
 		}
 	}
 
-	private void fireFailedConnection(SharingPeer peer, Throwable cause) {
+	protected void fireFailedConnection(SharingPeer peer, Throwable cause) {
 		for (IncomingConnectionListener listener : this.listeners) {
 			listener.handleFailedConnection(peer, cause);
 		}
@@ -486,11 +496,12 @@ public class ConnectionHandler implements Runnable {
 		public void run() {
 			InetSocketAddress address =
 				new InetSocketAddress(this.peer.getIp(), this.peer.getPort());
-			SocketChannel channel = null;
+			SocketInterface channel = null;
 
 			try {
 				logger.info("Connecting to {}...", this.peer);
-				channel = SocketChannel.open(address);
+				SocketChannel socket_channel = SocketChannel.open(address);
+				channel = new SocketChannelWrapper(socket_channel);
 				while (!channel.isConnected()) {
 					Thread.sleep(10);
 				}

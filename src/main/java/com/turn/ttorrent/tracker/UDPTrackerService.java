@@ -45,7 +45,7 @@ import com.turn.ttorrent.common.protocol.udp.UDPConnectResponseMessage;
  */
 public class UDPTrackerService 
 {
-	private static final Logger logger =
+	protected static final Logger logger =
 		LoggerFactory.getLogger(UDPTrackerService.class);
 
 	/**
@@ -55,14 +55,14 @@ public class UDPTrackerService
 	 * bytes + 6 bytes per peer. Common numWant is 50, so 20 + 6 * 50 = 320.
 	 * With headroom, we'll ask for 512 bytes.
 	 */
-	private static final int UDP_PACKET_LENGTH = 512;
+	protected static final int UDP_PACKET_LENGTH = 512;
 
 	private final String version;
 	private final ConcurrentMap<String, TrackedTorrent> torrents;
 	private DatagramSocket socket;
-	private boolean stop = false;
+	protected boolean stop = false;
 	private final Random random;
-	private ClientsCollectorThread collector = null;
+	protected ClientsCollectorThread collector = null;
 	
 	/**
 	 * List of tracker clients.
@@ -78,7 +78,7 @@ public class UDPTrackerService
 	 * @param torrents The torrents this UDPTrackerService should serve requests
 	 * for.
 	 */
-	UDPTrackerService(String version, ConcurrentMap<String, TrackedTorrent> torrents) {
+	public UDPTrackerService(String version, ConcurrentMap<String, TrackedTorrent> torrents) {
 		this.version = version;
 		this.torrents = torrents;
 		
@@ -145,7 +145,7 @@ public class UDPTrackerService
 	 *
 	 * @param DatagramPacket packet The received packet
 	 */
-	private void handle(DatagramPacket packet) {
+	protected void handle(DatagramPacket packet) {
 		try {
 			ByteBuffer data = ByteBuffer.wrap(packet.getData(), 0, packet.getLength());
 			
@@ -213,7 +213,7 @@ public class UDPTrackerService
 		this.clients.put(connectionId, client);
 		
 		// Compute and send the response
-		this.send(client.getAddress(), UDPConnectResponseMessage.craft(
+		this.send(client, UDPConnectResponseMessage.craft(
 				request.getTransactionId(), connectionId.longValue()).getData());
 		logger.info("Connect response sent to "+packet.getAddress());
 	}
@@ -294,7 +294,7 @@ public class UDPTrackerService
 			torrent.getSomePeers(peer));
 		
 		// Send the awnser
-		this.send(client.getAddress(), announceResponse.getData());
+		this.send(client, announceResponse.getData());
 		logger.info("Announce response sent to "+client.getAddress());
 	}
 	
@@ -304,16 +304,16 @@ public class UDPTrackerService
 	 * @param address
 	 * @param message
 	 */
-	private void send(InetSocketAddress address, ByteBuffer data) {
+	protected void send(UDPTrackedClient client, ByteBuffer data) {
 		try {
 			this.socket.send(new DatagramPacket(
 				data.array(),
 				data.capacity(),
-				address
+				client.getAddress()
 			));
 		} catch (IOException e) {
 			logger.warn("Error sending datagram packet to client at {}: {}.",
-				address, e.getMessage());
+				client.getAddress(), e.getMessage());
 		}
 	}
 
@@ -322,7 +322,7 @@ public class UDPTrackerService
 	 * from the list.
 	 * 
 	 */
-	private class ClientsCollectorThread extends Thread {
+	public class ClientsCollectorThread extends Thread {
 		
 		private static final int CLIENT_COLLECTION_FREQUENCY_SECONDS = 15;
 

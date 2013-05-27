@@ -69,7 +69,7 @@ public class UDPTrackerClient extends TrackerClient {
 	/**
 	 * Back-off timeout uses 15 * 2 ^ n formula.
 	 */
-	private static final int UDP_BASE_TIMEOUT_SECONDS = 15;
+	protected static final int UDP_BASE_TIMEOUT_SECONDS = 15;
 
 	/**
 	 * We don't try more than 8 times (3840 seconds, as per the formula defined
@@ -77,13 +77,13 @@ public class UDPTrackerClient extends TrackerClient {
 	 *
 	 * @see #UDP_BASE_TIMEOUT_SECONDS
 	 */
-	private static final int UDP_MAX_TRIES = 8;
+	protected static final int UDP_MAX_TRIES = 8;
 
 	/**
 	 * For STOPPED announce event, we don't want to be bothered with waiting
 	 * that long. We'll try once and bail-out early.
 	 */
-	private static final int UDP_MAX_TRIES_ON_STOPPED = 1;
+	protected static final int UDP_MAX_TRIES_ON_STOPPED = 1;
 
 	/**
 	 * Maximum UDP packet size expected, in bytes.
@@ -92,12 +92,12 @@ public class UDPTrackerClient extends TrackerClient {
 	 * bytes + 6 bytes per peer. Common numWant is 50, so 20 + 6 * 50 = 320.
 	 * With headroom, we'll ask for 512 bytes.
 	 */
-	private static final int UDP_PACKET_LENGTH = 512;
+	protected static final int UDP_PACKET_LENGTH = 512;
 
-	private final InetSocketAddress address;
+	protected InetSocketAddress address;
 	private final Random random;
 
-	private DatagramSocket socket;
+	protected DatagramSocket socket;
 	private Date connectionExpiration;
 	private long connectionId;
 	private int transactionId;
@@ -116,18 +116,21 @@ public class UDPTrackerClient extends TrackerClient {
 		throws UnknownHostException {
 		super(torrent, peer, tracker);
 
-		/**
-		 * The UDP announce request protocol only supports IPv4
-		 *
-		 * @see http://bittorrent.org/beps/bep_0015.html#ipv6
-		 */
-		if (! (InetAddress.getByName(peer.getIp()) instanceof Inet4Address)) {
-			throw new UnsupportedAddressTypeException();
+		// Check for supported tracker URI
+		if (tracker.getScheme().startsWith("http") || tracker.getScheme().equals("udp")) {
+			/**
+			 * The UDP announce request protocol only supports IPv4
+			 *
+			 * @see http://bittorrent.org/beps/bep_0015.html#ipv6
+			 */
+			if (! (InetAddress.getByName(peer.getIp()) instanceof Inet4Address)) {
+				throw new UnsupportedAddressTypeException();
+			}
+	
+			this.address = new InetSocketAddress(
+				tracker.getHost(),
+				tracker.getPort());
 		}
-
-		this.address = new InetSocketAddress(
-			tracker.getHost(),
-			tracker.getPort());
 
 		this.socket = null;
 		this.random = new Random();
@@ -154,7 +157,9 @@ public class UDPTrackerClient extends TrackerClient {
 		int attempts = -1;
 
 		try {
-			this.socket = new DatagramSocket();
+			if (this.socket == null) {
+				this.socket = new DatagramSocket();
+			}
 
 			while (++attempts <= maxAttempts) {
 				// Transaction ID is randomized for each exchange.
@@ -334,7 +339,7 @@ public class UDPTrackerClient extends TrackerClient {
 	 * @param data The {@link ByteBuffer} to send in a datagram packet to the
 	 * tracker.
 	 */
-	private void send(ByteBuffer data) {
+	protected void send(ByteBuffer data) {
 		try {
 			this.socket.send(new DatagramPacket(
 				data.array(),
@@ -353,7 +358,7 @@ public class UDPTrackerClient extends TrackerClient {
 	 * receive operation.
 	 * @retun Returns a {@link ByteBuffer} containing the packet data.
 	 */
-	private ByteBuffer recv(int attempt)
+	protected ByteBuffer recv(int attempt)
 		throws IOException, SocketException, SocketTimeoutException {
 		int timeout = UDP_BASE_TIMEOUT_SECONDS * (int)Math.pow(2, attempt);
 		logger.trace("Setting receive timeout to {}s for attempt {}...",

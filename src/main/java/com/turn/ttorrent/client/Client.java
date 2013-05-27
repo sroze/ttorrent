@@ -24,6 +24,7 @@ import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.common.protocol.PeerMessage;
 import com.turn.ttorrent.common.protocol.TrackerMessage;
 import com.turn.ttorrent.client.peer.SharingPeer;
+import com.turn.ttorrent.client.socket.SocketInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -113,18 +114,18 @@ public class Client extends Observable implements Runnable,
 
 	private static final String BITTORRENT_ID_PREFIX = "-TO0042-";
 
-	private SharedTorrent torrent;
+	protected SharedTorrent torrent;
 	private ClientState state;
-	private Peer self;
+	protected Peer self;
 
 	private Thread thread;
 	private boolean stop;
 	private long seed;
 
-	private ConnectionHandler service;
-	private Announce announce;
-	private ConcurrentMap<String, SharingPeer> peers;
-	private ConcurrentMap<String, SharingPeer> connected;
+	protected ConnectionHandler service;
+	protected Announce announce;
+	protected ConcurrentMap<String, SharingPeer> peers;
+	protected ConcurrentMap<String, SharingPeer> connected;
 
 	private Random random;
 
@@ -136,8 +137,7 @@ public class Client extends Observable implements Runnable,
 	 */
 	public Client(InetAddress address, SharedTorrent torrent)
 		throws UnknownHostException, IOException {
-		this.torrent = torrent;
-		this.state = ClientState.WAITING;
+		this(torrent);
 
 		String id = Client.BITTORRENT_ID_PREFIX + UUID.randomUUID()
 			.toString().split("-")[4];
@@ -151,7 +151,8 @@ public class Client extends Observable implements Runnable,
 			this.service.getSocketAddress()
 				.getAddress().getHostAddress(),
 			(short)this.service.getSocketAddress().getPort(),
-			ByteBuffer.wrap(id.getBytes(Torrent.BYTE_ENCODING)));
+			ByteBuffer.wrap(id.getBytes(Torrent.BYTE_ENCODING))
+		);
 
 		// Initialize the announce request thread, and register ourselves to it
 		// as well.
@@ -165,7 +166,19 @@ public class Client extends Observable implements Runnable,
 				this.torrent.getName(),
 				this.self.getIp(),
 				this.self.getPort()
-			});
+			}
+		);
+	}
+	
+	/**
+	 * Initialize the BitTorrent client.
+	 * 
+	 * @param torrent
+	 */
+	public Client(SharedTorrent torrent)
+	{
+		this.torrent = torrent;
+		this.state = ClientState.WAITING;
 
 		this.peers = new ConcurrentHashMap<String, SharingPeer>();
 		this.connected = new ConcurrentHashMap<String, SharingPeer>();
@@ -722,7 +735,7 @@ public class Client extends Observable implements Runnable,
 	 * @see com.turn.ttorrent.client.peer.SharingPeer
 	 */
 	@Override
-	public void handleNewPeerConnection(SocketChannel channel, byte[] peerId) {
+	public void handleNewPeerConnection(SocketInterface channel, byte[] peerId) {
 		Peer search = new Peer(
 			channel.socket().getInetAddress().getHostAddress(),
 			channel.socket().getPort(),

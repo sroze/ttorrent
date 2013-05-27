@@ -16,6 +16,7 @@
 package com.turn.ttorrent.client.peer;
 
 import com.turn.ttorrent.client.SharedTorrent;
+import com.turn.ttorrent.client.socket.SocketInterface;
 import com.turn.ttorrent.common.protocol.PeerMessage;
 
 import java.io.EOFException;
@@ -76,7 +77,7 @@ class PeerExchange {
 
 	private SharingPeer peer;
 	private SharedTorrent torrent;
-	private SocketChannel channel;
+	private SocketInterface channel;
 
 	private Set<MessageListener> listeners;
 
@@ -93,7 +94,7 @@ class PeerExchange {
 	 * @param channel A channel on the connected socket to the peer.
 	 */
 	public PeerExchange(SharingPeer peer, SharedTorrent torrent,
-			SocketChannel channel) throws SocketException {
+			SocketInterface channel) throws SocketException {
 		this.peer = peer;
 		this.torrent = torrent;
 		this.channel = channel;
