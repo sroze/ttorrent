@@ -82,7 +82,7 @@ public abstract class Tracker {
 	public void start() {
 		if (this.collector == null || !this.collector.isAlive()) {
 			this.collector = new PeerCollectorThread();
-			this.collector.setName("peer-collector:" + this.address.getPort());
+			this.collector.setName("peer-collector" + (this.address != null ? ":"+this.address.getPort() : ""));
 			this.collector.start();
 		}
 	}
