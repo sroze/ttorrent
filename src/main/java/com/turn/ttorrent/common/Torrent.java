@@ -172,7 +172,7 @@ public class Torrent {
 			this.trackers = new ArrayList<List<URI>>();
 			this.allTrackers = new HashSet<URI>();
 
-			if (!this.decoded.containsKey("announce-list")) {
+			if (!this.decoded.containsKey("announce-list") && this.decoded.containsKey("announce")) {
 				URI tracker = new URI(this.decoded.get("announce").getString());
 				this.allTrackers.add(tracker);
 
