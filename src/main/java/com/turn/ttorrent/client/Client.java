@@ -509,7 +509,7 @@ public class Client extends Observable implements Runnable,
 	 *
 	 * @param search The {@link Peer} specification.
 	 */
-	private SharingPeer getOrCreatePeer(Peer search) {
+	protected SharingPeer getOrCreatePeer(Peer search) {
 		SharingPeer peer;
 
 		synchronized (this.peers) {
@@ -737,8 +737,8 @@ public class Client extends Observable implements Runnable,
 	@Override
 	public void handleNewPeerConnection(SocketInterface channel, byte[] peerId) {
 		Peer search = new Peer(
-			channel.socket().getInetAddress().getHostAddress(),
-			channel.socket().getPort(),
+			channel.getInetAddress().getHostAddress(),
+			channel.getPort(),
 			(peerId != null
 				? ByteBuffer.wrap(peerId)
 				: (ByteBuffer)null));

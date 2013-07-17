@@ -279,10 +279,9 @@ public class ConnectionHandler implements Runnable {
 	 * socket.
 	 */
 	private String socketRepr(SocketInterface channel) {
-		Socket s = channel.socket();
 		return String.format("%s:%d%s",
-			s.getInetAddress().getHostName(),
-			s.getPort(),
+			channel.getInetAddress().getHostName(),
+			channel.getPort(),
 			channel.isConnected() ? "+" : "-");
 	}
 

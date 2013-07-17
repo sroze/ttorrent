@@ -1,6 +1,7 @@
 package com.turn.ttorrent.client.socket;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -56,5 +57,15 @@ public class SocketChannelWrapper implements SocketInterface
 	@Override
 	public boolean isConnected() {
 		return channel.isConnected();
+	}
+
+	@Override
+	public InetAddress getInetAddress() {
+		return channel.socket().getInetAddress();
+	}
+
+	@Override
+	public int getPort() {
+		return channel.socket().getPort();
 	}
 }
