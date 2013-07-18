@@ -34,7 +34,7 @@ import java.nio.ByteBuffer;
  */
 public class Peer {
 
-	private final InetSocketAddress address;
+	protected final InetSocketAddress address;
 	private final String hostId;
 
 	private ByteBuffer peerId;
@@ -78,9 +78,9 @@ public class Peer {
 	 */
 	public Peer(InetSocketAddress address, ByteBuffer peerId) {
 		this.address = address;
-		this.hostId = String.format("%s:%d",
+		this.hostId = address != null ? String.format("%s:%d",
 			this.address.getAddress(),
-			this.address.getPort());
+			this.address.getPort()) : null;
 
 		this.setPeerId(peerId);
 	}
@@ -199,7 +199,7 @@ public class Peer {
 			return false;
 		}
 
-		return this.hostId.equals(other.hostId) &&
+		return this.hostId != null && this.hostId.equals(other.hostId) &&
 			(this.hasPeerId()
 				 ? this.hexPeerId.equals(other.hexPeerId)
 				 : true);
