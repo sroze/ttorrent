@@ -53,10 +53,6 @@ import java.util.concurrent.Future;
 
 import jargs.gnu.CmdLineParser;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.PatternLayout;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -883,9 +879,6 @@ public class Torrent {
 	 * TODO: support multiple announce URLs.
 	 */
 	public static void main(String[] args) {
-		BasicConfigurator.configure(new ConsoleAppender(
-			new PatternLayout("%-5p: %m%n")));
-
 		CmdLineParser parser = new CmdLineParser();
 		CmdLineParser.Option help = parser.addBooleanOption('h', "help");
 		CmdLineParser.Option filename = parser.addStringOption('t', "torrent");
