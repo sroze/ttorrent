@@ -15,29 +15,16 @@
  */
 package com.turn.ttorrent.tracker;
 
-import com.turn.ttorrent.common.Torrent;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import jargs.gnu.CmdLineParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.simpleframework.transport.connect.Connection;
-import org.simpleframework.transport.connect.SocketConnection;
+import com.turn.ttorrent.common.Torrent;
 
 /**
  * BitTorrent tracker.

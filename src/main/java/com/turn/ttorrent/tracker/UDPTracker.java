@@ -1,17 +1,12 @@
 package com.turn.ttorrent.tracker;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.simpleframework.transport.connect.SocketConnection;
 
 /**
  * BitTorrent UDP tracker.

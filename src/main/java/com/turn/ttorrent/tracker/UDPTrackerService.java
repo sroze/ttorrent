@@ -6,21 +6,16 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
 import java.util.Calendar;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.simpleframework.http.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.turn.ttorrent.common.protocol.TrackerMessage.AnnounceRequestMessage;
-import com.turn.ttorrent.common.protocol.TrackerMessage.ErrorMessage;
 import com.turn.ttorrent.common.protocol.TrackerMessage.MessageValidationException;
-import com.turn.ttorrent.common.protocol.http.HTTPAnnounceResponseMessage;
 import com.turn.ttorrent.common.protocol.udp.UDPAnnounceRequestMessage;
 import com.turn.ttorrent.common.protocol.udp.UDPAnnounceResponseMessage;
 import com.turn.ttorrent.common.protocol.udp.UDPConnectRequestMessage;

@@ -15,15 +15,9 @@
  */
 package com.turn.ttorrent.client;
 
-import com.turn.ttorrent.common.Torrent;
-import com.turn.ttorrent.client.peer.SharingPeer;
-import com.turn.ttorrent.client.socket.SocketChannelWrapper;
-import com.turn.ttorrent.client.socket.SocketInterface;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
@@ -40,6 +34,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.turn.ttorrent.client.peer.SharingPeer;
+import com.turn.ttorrent.client.socket.SocketChannelWrapper;
+import com.turn.ttorrent.client.socket.SocketInterface;
+import com.turn.ttorrent.common.Torrent;
 
 
 /**

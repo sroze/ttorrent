@@ -15,16 +15,10 @@
  */
 package com.turn.ttorrent.client.peer;
 
-import com.turn.ttorrent.client.SharedTorrent;
-import com.turn.ttorrent.client.socket.SocketInterface;
-import com.turn.ttorrent.common.protocol.PeerMessage;
-
 import java.io.EOFException;
 import java.io.IOException;
-import java.lang.InterruptedException;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 import java.text.ParseException;
 import java.util.BitSet;
 import java.util.HashSet;
@@ -35,6 +29,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.turn.ttorrent.client.SharedTorrent;
+import com.turn.ttorrent.client.socket.SocketInterface;
+import com.turn.ttorrent.common.protocol.PeerMessage;
 
 
 /**
